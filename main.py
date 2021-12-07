@@ -46,7 +46,8 @@ def clear(): os.system('cls')
 
 def getAPI():
     # Loads Bazaar data from the hypixel API
-    response_API = requests.get('https://api.hypixel.net/skyblock/bazaar?key=07a447d1-f4ff-4012-90df-4b58fd54dc7e')
+    key = 'ENTER YOUR API KEY'
+    response_API = requests.get('https://api.hypixel.net/skyblock/bazaar?key='+key)
     data = response_API.text
     parseJSON = json.loads(data)
     # Weird unexplained and non-existent items given by the API. Not the real Carrot on a stick or booster cookie.
@@ -99,7 +100,6 @@ def writeToHistory(item):
         'Sales Ratio': item.salesRatio
     }
     df1 = df1.append(df2, ignore_index=True)
-    print(item.name)
     return df1
 
 
@@ -136,8 +136,7 @@ if __name__ == '__main__':
     parse_json = getAPI()
     liveListOfItems = [writeItem(x) for x in parse_json['products'].keys()]
 
-    sortBy = buyVolumeSort
-    liveListOfItems.sort(reverse=True, key=sortBy)
+    sortBy = flatMarginSort
 
     while True:
         # print(df.loc[df['UNIX Time'] == 1638893340])
@@ -148,7 +147,9 @@ if __name__ == '__main__':
             df.to_csv('history/' + x.name + '.csv', index=False)
         clear()
         # flatMarginSort, percentMarginSort, buyVolumeSort, sellVolumeSort, salesRatioSort, backlogSort
-        print('Item', '|', sortBy.__name__)
-        for x in liveListOfItems:
+        liveListOfItems.sort(reverse=True, key=sortBy)
+        print(sortBy.__name__, '\n')
+        for x in liveListOfItems[:9]:
             print(x.name, ':', sortBy(x))
-        time.sleep(5)
+
+        time.sleep(10)
